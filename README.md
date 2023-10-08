@@ -3,10 +3,10 @@ A daemon or service for notifying about Islamic prayers timings on Linux using a
 ![1696799901](https://github.com/abdalrahmanshaban0/Islamic-Prayer-timings/assets/126330281/709c0a8e-2a14-4dee-a5ce-22f3970d23e1)
 
 Dependancies:
-1- g++
-2- curl
-3- jq
-4- dunst (Or any notification server.)
+1- g++<br>
+2- curl<br>
+3- jq<br>
+4- dunst (Or any notification server.)<br>
 
 ```shell
 # Starting the program for current session
