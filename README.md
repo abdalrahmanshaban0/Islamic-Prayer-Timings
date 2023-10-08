@@ -15,3 +15,4 @@ Dependancies:<br>
 ```
 
 You can auto start "update_timings.sh" on startup on you system.
+Note: in every execution timings are updated, so every day when auto start it will be upated.
