@@ -10,6 +10,9 @@ Dependancies:<br>
 4- dunst (Or any notification server.)<br>
 
 ```shell
+# Make them executable
+chmod +x update_timings.sh
+chmod +x set_next.sh
 # Starting the program for current session
 ./update_timings.sh
 ```
