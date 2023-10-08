@@ -43,6 +43,6 @@ echo "Comming pray is [$NAME] after $DIFF seconds"
 
 sleep $DIFF;
 
-notify-send "مواقيت الصلاة"  "حان الآن موعد صلاة $CUR"; 
+notify-send "مواقيت الصلاة"  "حان الآن موعد آذان $CUR"; 
 
 ./set_next.sh
