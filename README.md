@@ -10,6 +10,7 @@ Dependancies:<br>
 4- dunst (Or any notification server.)<br>
 
 ```shell
+# First, you must be in same directory as the project
 # Make them executable
 chmod +x update_timings.sh
 chmod +x set_next.sh
@@ -19,8 +20,3 @@ chmod +x set_next.sh
 
 You can auto start "update_timings.sh" on startup on you system.
 Note: in every execution timings are updated, so every day when auto start it will be upated.
-
-```shell
-# Example for auto starting command:
-cd $(Path to project dir) && ./update_timings.sh
-```
