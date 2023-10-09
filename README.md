@@ -19,3 +19,8 @@ chmod +x set_next.sh
 
 You can auto start "update_timings.sh" on startup on you system.
 Note: in every execution timings are updated, so every day when auto start it will be upated.
+
+```shell
+# Example for auto starting command:
+cd $(Path to project dir) && ./update_timings.sh
+```
