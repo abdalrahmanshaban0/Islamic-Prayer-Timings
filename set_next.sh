@@ -22,9 +22,6 @@ DIFF="${PRAY[1]}"
 if [ $NAME -eq 0 ] 
 then
     CUR="الفجر"
-elif [ $NAME -eq 1 ]
-then
-    CUR="الصبح"
 elif [ $NAME -eq 2 ]
 then
     CUR="الظهر"
@@ -42,7 +39,9 @@ fi
 echo "Comming pray is [$NAME] after $DIFF seconds"
 
 sleep $DIFF;
-
+if [ ! $NAME -eq 1 ]
+then
 notify-send "مواقيت الصلاة"  "حان الآن موعد آذان $CUR"; 
+fi
 
 ./set_next.sh
