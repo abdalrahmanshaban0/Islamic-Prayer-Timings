@@ -16,7 +16,7 @@ NAME="${PRAY[0]}"
 DIFF="${PRAY[1]}"
 
 #For testing
-#DIFF=5
+#DIFF=15
 #NAME=0
 
 if [ $NAME -eq 0 ] 
@@ -36,12 +36,13 @@ then
     CUR="العشاء"
 fi
 
-echo "Comming pray is [$NAME] after $DIFF seconds"
+while true
+do
+    echo "Comming pray is [$NAME] after $DIFF seconds"
 
-sleep $DIFF;
-if [ ! $NAME -eq 1 ]
-then
-notify-send "مواقيت الصلاة"  "حان الآن موعد آذان $CUR"; 
-fi
-
-./set_next.sh
+    sleep $DIFF;
+    if [ ! $NAME -eq 1 ]
+    then
+        notify-send "مواقيت الصلاة"  "حان الآن موعد آذان $CUR"; 
+    fi
+done
