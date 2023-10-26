@@ -25,9 +25,9 @@ fi
 
 curl -L "http://api.aladhan.com/v1/timingsByCity?city=$CI&country=$CN&method=$METHOD" -H "Accept: application/json" | jq > timings.json
 
-g++ main.cpp
-g++ calc_next.cpp
-rm a.out
+g++ main.cpp -o up.out
+./up.out
+rm up.out
 
 ./set_next.sh
 
