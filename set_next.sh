@@ -36,13 +36,12 @@ then
     CUR="العشاء"
 fi
 
-while true
-do
-    echo "Comming pray is [$NAME] after $DIFF seconds"
+echo "Comming pray is [$NAME] after $DIFF seconds"
 
-    sleep $DIFF;
-    if [ ! $NAME -eq 1 ]
-    then
-        notify-send "مواقيت الصلاة"  "حان الآن موعد آذان $CUR"; 
-    fi
-done
+sleep $DIFF;
+if [ ! $NAME -eq 1 ]
+then
+    notify-send "مواقيت الصلاة"  "حان الآن موعد آذان $CUR"; 
+fi
+
+./set_next.sh
