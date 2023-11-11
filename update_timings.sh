@@ -23,11 +23,14 @@ else
     METHOD=$method
 fi
 
+if ping -q -c 1 -W 1 8.8.8.8 > /dev/null
+then
 curl -L "http://api.aladhan.com/v1/timingsByCity?city=$CI&country=$CN&method=$METHOD" -H "Accept: application/json" | jq > timings.json
 
 g++ main.cpp -o up.out
 ./up.out
 rm up.out
+fi
 
 ./set_next.sh
 
