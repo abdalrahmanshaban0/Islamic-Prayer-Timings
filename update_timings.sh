@@ -12,7 +12,7 @@ if [ ! -f "$FILE" ]; then
     echo "Enter you City :"
     read CI
     echo "city=$CI" >> $FILE
-    echo "Choose a prayer times calculation method (number) from :"
+    echo "Choose a prayer times calculation method (default:5) from :"
     echo $LINK
     read METHOD
     echo "method=$METHOD" >> $FILE
