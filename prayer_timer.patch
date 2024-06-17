@@ -1,0 +1,76 @@
+diff --git a/Makefile b/Makefile
+index 7a18274..854f21d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -27,7 +27,8 @@ COM =\
+ 	components/uptime\
+ 	components/user\
+ 	components/volume\
+-	components/wifi
++	components/wifi\
++	components/prayer_timer
+ 
+ all: slstatus
+ 
+diff --git a/components/prayer_timer.c b/components/prayer_timer.c
+new file mode 100644
+index 0000000..ed40391
+--- /dev/null
++++ b/components/prayer_timer.c
+@@ -0,0 +1,29 @@
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include "../slstatus.h"
++#include "../util.h"
++
++void SecondsToString(int seconds, char *buffer, int buffer_size) {
++    int hours = seconds / 3600;
++    int minutes = (seconds % 3600) / 60;
++    int secs = seconds % 60;
++    
++    snprintf(buffer, buffer_size, "%02d:%02d:%02d", hours, minutes, secs);
++}
++
++const char *
++prayer_timer(const char* path){
++    FILE* f = fopen(path, "r");
++    char* arr[6] = {"Fajr ", "Sunrise ", "Dhuhr ", "Asr ", "Maghrib ", "Isha "};
++    int idx = 0, rem = 0;
++    fscanf(f, "%d", &idx);
++    fscanf(f, "%d", &rem);
++    fclose(f);
++    char temp[10];
++    SecondsToString(rem, temp, 10);
++    char* str = (char*) malloc(32*sizeof(char));
++    strcpy(str, arr[idx]);
++    strcat(str, temp);
++    return str;
++}
+diff --git a/config.def.h b/config.def.h
+index d805331..eba2c31 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -62,6 +62,11 @@ static const char unknown_str[] = "n/a";
+  *                                                     NULL on OpenBSD/FreeBSD
+  * wifi_essid          WiFi ESSID                      interface name (wlan0)
+  * wifi_perc           WiFi signal in percent          interface name (wlan0)
++ *
++ * prayer_timer        remaining timer for next pray   path to text file contains
++*                                                      the index of the next pray
++*                                                      and the time remaining for
++*                                                      it in seconds
+  */
+ static const struct arg args[] = {
+ 	/* function format          argument */
+diff --git a/slstatus.h b/slstatus.h
+index 8ef5874..6217876 100644
+--- a/slstatus.h
++++ b/slstatus.h
+@@ -82,3 +82,6 @@ const char *vol_perc(const char *card);
+ /* wifi */
+ const char *wifi_essid(const char *interface);
+ const char *wifi_perc(const char *interface);
++
++/*Prayer Timings*/
++const char *prayer_timer(const char* path);
