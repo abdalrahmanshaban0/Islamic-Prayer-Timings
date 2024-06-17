@@ -19,7 +19,11 @@ chmod +x update_rem.sh
 # Starting the program for current session
 ./update_timings.sh
 ```
+```shell
+#to apply the patch
+git apply prayer_timer.patch
+```
 
-You can auto start "update_timings.sh" on startup on you system.
-Note: You must change every absolute path used in this project to yours!!.
+You can auto start "update_timings.sh" on startup on you system.<br>
+Note: You must change every absolute path used in this project to yours!!.<br>
 Note: in every execution timings are updated, so every day when auto start it will be upated.
