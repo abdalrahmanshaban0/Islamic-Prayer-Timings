@@ -2,17 +2,14 @@
 using namespace std;
 
 int main(){
-    time_t now = time(0);
-    
+    time_t now = time(NULL);
     tm *cur = localtime(&now);
-    int cur_val = (cur->tm_min) *60 + (cur->tm_hour) *60*60;
-
-//    cur_val = 10 * 60 * 60;   //for testing
+    int cur_val = (cur->tm_min) *60 + (cur->tm_hour) *60*60 + (cur->tm_sec);
 
     int comming_val = 0;
     int comming_idx = 0;
 
-    FILE *F = freopen("table.txt", "r", stdin);
+    FILE *F = freopen("/home/abdalrahman/.src/Islamic-Prayer-Timings/table.txt", "r", stdin);
     for(int i = 0; i < 6; i++){
         string name, time;
         int secs;
@@ -30,9 +27,5 @@ int main(){
     if(dff < 0){
         dff += 24 * 60 * 60;
     }
-    
-    //cout << cur_val << ' ' << comming_val << '\n';
     cout << comming_idx << '\n'  << dff << '\n';
-
-
 }
