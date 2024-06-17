@@ -1,6 +1,6 @@
 # Islamic-Prayer-timings
 A daemon or service for notifying about Islamic prayers timings on Linux using an API from aladhan.com.
-![image](https://github.com/abdalrahmanshaban0/Islamic-Prayer-timings/assets/126330281/73fdb505-4794-45f9-93c7-0b144397cffa)
+![1718618138](https://github.com/abdalrahmanshaban0/Islamic-Prayer-Timings/assets/126330281/3c738d60-5121-48ad-b576-4b57497ab790)
 
 
 Dependancies:<br>
