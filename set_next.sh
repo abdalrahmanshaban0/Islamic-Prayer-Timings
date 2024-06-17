@@ -1,8 +1,6 @@
 #!/usr/bin/bash
-FILE="next.txt"
-g++ calc_next.cpp -o calc.out
-./calc.out > $FILE
-rm calc.out
+FILE="/home/abdalrahman/.src/Islamic-Prayer-Timings/next.txt"
+/home/abdalrahman/.src/Islamic-Prayer-Timings/calc_next.o > $FILE
 
 i=0
 
@@ -44,4 +42,4 @@ then
     notify-send "مواقيت الصلاة"  "حان الآن موعد آذان $CUR"; 
 fi
 
-./set_next.sh
+/home/abdalrahman/.src/Islamic-Prayer-Timings/set_next.sh
