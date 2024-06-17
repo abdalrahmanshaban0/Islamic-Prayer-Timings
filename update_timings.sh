@@ -1,6 +1,6 @@
 #!/usr/bin/bash
-DIR=~/.config/prayer_timings/
-FILE=~/.config/prayer_timings/location.conf
+DIR=home/abdalrahman/.config/prayer_timings/
+FILE=/home/abdalrahman/.config/prayer_timings/location.conf
 
 LINK=https://aladhan.com/prayer-times-api#GetTimingsByCity;
 
@@ -25,12 +25,10 @@ fi
 
 if ping -q -c 1 -W 1 8.8.8.8 > /dev/null
 then
-curl -L "http://api.aladhan.com/v1/timingsByCity?city=$CI&country=$CN&method=$METHOD" -H "Accept: application/json" | jq > timings.json
+curl -L "http://api.aladhan.com/v1/timingsByCity?city=$CI&country=$CN&method=$METHOD" -H "Accept: application/json" | jq > ~/.src/Islamic-Prayer-Timings/timings.json
 
-g++ main.cpp -o up.out
-./up.out
-rm up.out
+g++ home/abdalrahman/.src/Islamic-Prayer-Timings/main.cpp -o /home/abdalrahman/.src/Islamic_Prayer_Timings/up.out
+/home/abdalrahman/.src/Islamic-Prayer-Timings/up.out
+rm /home/abdalrahman/.src/Islamic-Prayer-Timings/up.out
 fi
-
-./set_next.sh
-
+/home/abdalrahman/.src/Islamic-Prayer-Timings/set_next.sh
