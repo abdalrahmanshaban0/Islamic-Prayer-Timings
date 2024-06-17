@@ -20,8 +20,8 @@ chmod +x update_rem.sh
 ./update_timings.sh
 ```
 ```shell
-#to apply the patch
-git apply prayer_timer.patch
+#to apply the patch, run this is slstatus dir
+git apply PATH_TO/prayer_timer.patch
 ```
 
 You can auto start "update_timings.sh" on startup on you system.<br>
