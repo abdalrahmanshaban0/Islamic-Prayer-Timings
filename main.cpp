@@ -10,9 +10,8 @@ struct day{
 int main(){
     const int N = 7;
     day arr[N];
-    system("jq '.data.timings' timings.json > table.txt");
 
-    FILE *f = freopen("table.txt", "r", stdin);
+    FILE *f = freopen("/home/abdalrahman/.src/Islamic-Prayer-Timings/table.txt", "r", stdin);
 
     char usless; cin >> usless;
 
@@ -25,7 +24,7 @@ int main(){
     }
 
     fclose(f);
-    f = freopen("table.txt", "w", stdout);
+    f = freopen("/home/abdalrahman/.src/Islamic-Prayer-Timings/table.txt", "w", stdout);
 
     for(int i = 0 ; i < N; i++){
         if(i!=4) //(no need to Sunset, just Maghrib)
