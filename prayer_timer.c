@@ -20,10 +20,10 @@ prayer_timer(const char* path){
     fscanf(f, "%d", &idx);
     fscanf(f, "%d", &rem);
     fclose(f);
+    char tmr[30];
+    strcpy(tmr, arr[idx]);
     char temp[10];
     SecondsToString(rem, temp, 10);
-    char* str = (char*) malloc(32*sizeof(char));
-    strcpy(str, arr[idx]);
-    strcat(str, temp);
-    return str;
+    strcat(tmr, temp);
+    return bprintf(tmr);
 }
