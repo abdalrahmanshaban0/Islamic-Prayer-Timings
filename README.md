@@ -18,6 +18,8 @@ chmod +x update_timings.sh
 chmod +x set_next.sh
 # If you will use the prayer_timer.patch with slstatus
 chmod +x update_rem.sh
+
+g++ calc_next.cpp -o calc_next.o
 # Starting the program for current session
 ./update_timings.sh
 ```
