@@ -1,35 +1,82 @@
+#include <fstream>
 #include <iostream>
+#include <nlohmann/json.hpp>
+#include <thread>
 using namespace std;
 
-struct day{
-    string name;
-    string time;
-    int val;
-};
-
-int main(){
-    const int N = 7;
-    day arr[N];
-
-    FILE *f = freopen("/home/abdalrahman/.src/Islamic-Prayer-Timings/table.txt", "r", stdin);
-
-    char usless; cin >> usless;
-
-    for(int i = 0 ; i < N; i++){
-        string a, b; 
-        cin >> a >> b;
-        arr[i].name = a.substr(1, a.size()-3);
-        arr[i].time = b.substr(1, b.size()-3);
-        arr[i].val = stoi(arr[i].time.substr(0, 2))*60*60 + stoi(arr[i].time.substr(3, 2))*60;
+void setNext(string *prayerTimings) {
+  time_t now = time(NULL);
+  tm *cur = localtime(&now);
+  int cur_val = (cur->tm_min) * 60 + (cur->tm_hour) * 60 * 60 + (cur->tm_sec);
+  int comming_val = 0, comming_idx = 0;
+  for (int i = 0; i < 6; i++) {
+    int secs = stoi(prayerTimings[i].substr(0, 2)) * 3600 +
+               stoi(prayerTimings[i].substr(3, 2)) * 60;
+    if (i == 0)
+      comming_val = secs;
+    if (secs > cur_val) {
+      comming_idx = i;
+      comming_val = secs;
+      break;
     }
+  }
 
-    fclose(f);
-    f = freopen("/home/abdalrahman/.src/Islamic-Prayer-Timings/table.txt", "w", stdout);
+  int dff = comming_val - cur_val;
+  if (dff < 0)
+    dff += 24 * 3600;
 
-    for(int i = 0 ; i < N; i++){
-        if(i!=4) //(no need to Sunset, just Maghrib)
-            cout << arr[i].name << ' ' << arr[i].time << ' ' << arr[i].val << '\n';
+  while (dff--) {
+    ofstream nextFile("/home/abdalrahman/.src/Islamic-Prayer-Timings/next",
+                      ios::out | ios::trunc);
+    if (nextFile.is_open()) {
+      nextFile << comming_idx << endl << dff;
+      nextFile.flush();
+      nextFile.close();
+    } else {
+      cerr << "Error opening file next!" << endl;
+      exit(1);
     }
+    this_thread::sleep_for(1000ms);
+  }
+}
 
-    return 0;
+int main() {
+  string country = "Egypt", city = "Assiut";
+  string url =
+      "curl -L \"https://api.aladhan.com/v1/timingsByCity?city=" + city +
+      "&country=" + country +
+      "\" > /home/abdalrahman/.src/Islamic-Prayer-Timings/response.json";
+  system(url.c_str());
+
+  ifstream file("/home/abdalrahman/.src/Islamic-Prayer-Timings/response.json");
+
+  if (!file.is_open()) {
+    cerr << "Error opening file response.json!" << endl;
+    return 1;
+  }
+
+  nlohmann::json jsonResponse;
+  try {
+    file >> jsonResponse;
+  } catch (const nlohmann::json::parse_error &e) {
+    cerr << "Error parsing JSON: " << e.what() << endl;
+    return 1;
+  }
+  file.close();
+
+  auto data = jsonResponse["data"];
+  auto timings = data["timings"];
+
+  string prayerTimings[6];
+  prayerTimings[0] = timings["Fajr"];
+  prayerTimings[1] = timings["Sunrise"];
+  prayerTimings[2] = timings["Dhuhr"];
+  prayerTimings[3] = timings["Asr"];
+  prayerTimings[4] = timings["Maghrib"];
+  prayerTimings[5] = timings["Isha"];
+
+  while (true)
+    setNext(prayerTimings);
+
+  return 0;
 }
