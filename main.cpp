@@ -4,6 +4,9 @@
 #include <thread>
 using namespace std;
 
+const string names[6] = {"الفجر", "الشروق", "الظهر",
+                         "العصر", "المغرب", "العشاء"};
+
 void setNext(string *prayerTimings) {
   time_t now = time(NULL);
   tm *cur = localtime(&now);
@@ -37,6 +40,12 @@ void setNext(string *prayerTimings) {
       exit(1);
     }
     this_thread::sleep_for(1000ms);
+  }
+  if (comming_idx != 1) {
+    const string temp =
+        "notify-send \"مواقيت الصلاة\" \"حان الآن موعد آذان \"" +
+        names[comming_idx];
+    system(temp.c_str());
   }
 }
 
