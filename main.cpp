@@ -1,12 +1,30 @@
+#include <arpa/inet.h>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
+#include <sys/socket.h>
 #include <thread>
+#include <unistd.h>
+
 using namespace std;
 
 const string names[6] = {"الفجر", "الشروق", "الظهر",
                          "العصر", "المغرب", "العشاء"};
 
+bool isInternetAvailable() {
+  int sock = socket(AF_INET, SOCK_STREAM, 0);
+  if (sock < 0) {
+    cerr << "Socket creation failed!" << endl;
+    return false;
+  }
+  struct sockaddr_in server;
+  server.sin_family = AF_INET;
+  server.sin_port = htons(53); // DNS port (standard for testing)
+  server.sin_addr.s_addr = inet_addr("8.8.8.8"); // Google's DNS server
+  int result = connect(sock, (struct sockaddr *)&server, sizeof(server));
+  close(sock); // Close the socket after checking
+  return (result == 0);
+}
 void setNext(string *prayerTimings) {
   time_t now = time(NULL);
   tm *cur = localtime(&now);
@@ -51,12 +69,13 @@ void setNext(string *prayerTimings) {
 
 int main() {
   string country = "Egypt", city = "Assiut";
-  string url =
-      "curl -L \"https://api.aladhan.com/v1/timingsByCity?city=" + city +
-      "&country=" + country +
-      "\" > /home/abdalrahman/.src/Islamic-Prayer-Timings/response.json";
-  system(url.c_str());
-
+  if (isInternetAvailable()) {
+    string url =
+        "curl -L \"https://api.aladhan.com/v1/timingsByCity?city=" + city +
+        "&country=" + country +
+        "\" > /home/abdalrahman/.src/Islamic-Prayer-Timings/response.json";
+    system(url.c_str());
+  }
   ifstream file("/home/abdalrahman/.src/Islamic-Prayer-Timings/response.json");
 
   if (!file.is_open()) {
