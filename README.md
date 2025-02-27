@@ -9,7 +9,8 @@ Dependancies:<br>
 1- g++<br>
 2- curl<br>
 3- nlohmann-json<br>
-4- dunst (Or any notification server.)<br>
+4- libnotify<br>
+5- dunst (Or any notification server.)<br>
 
 ```shell
 g++ main.cpp -o IPT
