@@ -1,3 +1,2 @@
-response.json
-next
-IPT
+build/
+.idea/
