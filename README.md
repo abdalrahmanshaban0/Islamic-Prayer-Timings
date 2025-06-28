@@ -43,6 +43,18 @@ test the response using **postman**
 - Response is JSON, I need to send a GET request with `curl` to retrieve that response. 
 - AI tools like ChatGPT will be very useful to give examples and explains how to use curl.h and json.hpp, generally saving time of reading documentation.
 - Rest of the logic is simple
+## Build and run
+```shell
+git clone https://github.com/abdalrahmanshaban0/Islamic-Prayer-Timings/
+
+cd Islamic-Prayer-Timings
+mkdir build
+cd build
+cmake ..
+make
+
+./Islamic-Prayer-Timings
+```
 ## Waybar custom module
 You can see the [wiki](https://github.com/Alexays/Waybar/wiki/Module:-Custom) to know to add a custom module to Waybar.
 I want to show the next prayer timing name and a countdown timer. With tooltip on hover with the day prayer timings.
