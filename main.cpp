@@ -66,6 +66,8 @@ int main() {
       send_prayer_notification(names[nextPrayIdx]);
       runScript(onAdhanScript);
     }
+
+    this_thread::sleep_for(1s);
   }
   return EXIT_SUCCESS;
 }
