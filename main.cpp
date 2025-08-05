@@ -40,24 +40,22 @@ int main() {
     }
   }
 
+  json waybarReturn;
+  if (!hijriDate.empty()) {
+    waybarReturn["tooltip"] += hijriDate + "\n\n";
+  }
+  for (int i = 0; i < 6; ++i) {
+    waybarReturn["tooltip"] +=
+        format("{:<8}:{:>10}{}", names[i],
+               (hour24 ? prayerTimings[i] : to12HourFormat(prayerTimings[i])),
+               i < 5 ? "\n" : "");
+  }
+
   while (true) {
     auto [nextPrayIdx, diff] = getNextPrayer(prayerTimings);
-    std::string temp;
-    if (!hijriDate.empty()) {
-      temp += hijriDate + "\n\n";
-    }
-    for (int i = 0; i < 6; ++i) {
-      temp +=
-          format("{:<8}:{:>10}{}", names[i],
-                 (hour24 ? prayerTimings[i] : to12HourFormat(prayerTimings[i])),
-                 i < 5 ? "\n" : "");
-    }
     while (diff > 0) {
-      json resp;
-      resp["text"] = names[nextPrayIdx] + " " + seconds_to_HMS(diff);
-      resp["tooltip"] = temp;
-
-      cout << resp.dump() << endl;
+      waybarReturn["text"] = names[nextPrayIdx] + " " + seconds_to_HMS(diff);
+      cout << waybarReturn.dump() << endl;
       diff--;
       this_thread::sleep_for(1s);
     }
