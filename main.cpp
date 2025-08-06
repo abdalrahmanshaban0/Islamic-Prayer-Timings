@@ -44,12 +44,14 @@ int main() {
   if (!hijriDate.empty()) {
     waybarReturn["tooltip"] += hijriDate + "\n\n";
   }
+  string tooltip;
   for (int i = 0; i < 6; ++i) {
-    waybarReturn["tooltip"] +=
+    tooltip +=
         format("{:<8}:{:>10}{}", names[i],
                (hour24 ? prayerTimings[i] : to12HourFormat(prayerTimings[i])),
                i < 5 ? "\n" : "");
   }
+  waybarReturn["tooltip"] = tooltip;
 
   while (true) {
     auto [nextPrayIdx, diff] = getNextPrayer(prayerTimings);
