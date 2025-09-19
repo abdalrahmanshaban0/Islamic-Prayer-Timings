@@ -1,4 +1,3 @@
-
 #include "../include/utils.h"
 
 #include <arpa/inet.h>
@@ -10,7 +9,9 @@
 #include <filesystem>
 #include <iomanip>
 #include <iostream>
+#include <nlohmann/json.hpp>
 #include <ostream>
+#include <thread>
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -61,24 +62,33 @@ bool isInternetAvailable() {
   return connected;
 }
 
-void send_prayer_notification(const string& prayer_name) {
+void waitInternet(const int duration) {
+  while (!isInternetAvailable()) {
+    cerr << "Waiting for internet connection..." << endl;
+    std::this_thread::sleep_for(std::chrono::seconds(duration));
+  }
+}
+
+int send_prayer_notification(const string& prayer_name) {
   if (!notify_init("Islamic Prayer Notification")) {
     cerr << "Failed to initialize libnotify!" << endl;
-    return;
+    return 1;
   }
   // Create a new notification
   NotifyNotification* notification = notify_notification_new(
-      "مواقيت الصلاة", ("حان الآن موعد آذان " + prayer_name).c_str(),
+      "Islamic Prayer Timings", ("It's time for " + prayer_name).c_str(),
       "dialog-information");
 
   // Display the notification
   if (!notify_notification_show(notification, nullptr)) {
     cerr << "Failed to display notification!" << endl;
+    return 2;
   }
   // Free the notification object
   g_object_unref(G_OBJECT(notification));
   // Shutdown libnotify
   notify_uninit();
+  return 0;
 }
 
 std::string to12HourFormat(const std::string& time24) {
@@ -109,4 +119,21 @@ void runScript(const std::string& scriptPath) {
   } else {
     cerr << "Adhan script not found: " << scriptPath << endl;
   }
+}
+
+int secondsUntilMidnight() {
+  using namespace std::chrono;
+
+  auto now = system_clock::now();
+  time_t now_c = system_clock::to_time_t(now);
+  std::tm* now_tm = std::localtime(&now_c);
+
+  now_tm->tm_hour = 0;
+  now_tm->tm_min = 0;
+  now_tm->tm_sec = 0;
+  now_tm->tm_mday += 1;  // move to next day
+
+  auto midnight = system_clock::from_time_t(std::mktime(now_tm));
+  auto diff = duration_cast<seconds>(midnight - now);
+  return static_cast<int>(diff.count());
 }

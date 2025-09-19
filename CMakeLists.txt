@@ -4,13 +4,15 @@ project(Islamic_Prayer_Timings)
 # Set the C++ standard to C++20
 set(CMAKE_CXX_STANDARD 20)
 
-# Add the executable target with the name IPT
+# Add the executable target (name = IPT)
 add_executable(IPT
-        main.cpp
+        src/main.cpp
         include/utils.h
         src/utils.cpp
         include/prayer_timings.h
         src/prayerTimings.cpp
+        include/waybar.h
+        src/waybar.cpp
 )
 
 # Find CURL and libnotify

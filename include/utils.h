@@ -29,8 +29,9 @@ bool isInternetAvailable();
  * Sends notification using libnotify for the current prayer provided
  * with prayer_name
  * @param prayer_name current prayer timing
+ * @returns 0 on success and other positive integer on failure
  */
-void send_prayer_notification(const std::string& prayer_name);
+int send_prayer_notification(const std::string& prayer_name);
 
 /**
  * converts time from 24-hour format to 12-hour format
@@ -46,4 +47,15 @@ std::string to12HourFormat(const std::string& time24);
  */
 void runScript(const std::string& scriptPath);
 
+/**
+ * Calculates seconds from now until midnight
+ * @return Seconds until midnight
+ */
+int secondsUntilMidnight();
+
+/**
+ * Enters infinite loop until there's internet connection
+ * @param duration Seconds to sleep until checking internet connection again
+ */
+void waitInternet(int duration);
 #endif
