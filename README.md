@@ -5,7 +5,9 @@ See my post about this project in my technical blog [here](https://sudostart.com
   <img width="576" height="229" alt="image" src="https://github.com/user-attachments/assets/9cea9517-6536-4273-bd88-5e10717905bb" />
 </p>
 
-
+<p align="center">
+<img width="560" height="259" alt="image" src="https://github.com/user-attachments/assets/5e2330d9-1b8c-47f1-afbc-7641168f36f9" />
+</p>
 
 
 ## Build and run
