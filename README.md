@@ -2,7 +2,7 @@
 See my post about this project in my technical blog [here](https://sudostart.com/islamic-prayer-timings-for-linux/)
 
 <p align="center">
-  <img width="645" height="137" alt="Screenshot-2025-09-17_16:23:34" src="https://github.com/user-attachments/assets/59462048-a973-481d-afb5-efbfbf738f57" />
+  <img width="576" height="229" alt="image" src="https://github.com/user-attachments/assets/9cea9517-6536-4273-bd88-5e10717905bb" />
 </p>
 
 
