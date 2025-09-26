@@ -1,6 +1,5 @@
 #include <curl/curl.h>
 
-#include <condition_variable>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -10,7 +9,6 @@
 #include "../include/prayer_timings.h"
 #include "../include/utils.h"
 #include "../include/waybar.h"
-
 using namespace std;
 using json = nlohmann::json;
 namespace fs = filesystem;
@@ -24,7 +22,6 @@ extern vector<string> prayerTimings;
 extern string waybarTooltip;
 
 extern mutex dataMutex;
-extern condition_variable timingsReady;
 
 int loadConfig() {
   const char* homeEnv = std::getenv("HOME");
@@ -165,7 +162,7 @@ int getTimings(std::vector<std::string>& timings, std::string& hdate) {
   if (const CURLcode res = curl_easy_perform(curl); res != CURLE_OK) {
     std::cerr << "Request failed: " << curl_easy_strerror(res) << '\n';
     curl_easy_cleanup(curl);
-    return 1;
+    return 2;
   }
 
   curl_easy_cleanup(curl);
@@ -197,38 +194,47 @@ int getTimings(std::vector<std::string>& timings, std::string& hdate) {
             hijri["year"].get<std::string>();
   } catch (const std::exception& e) {
     std::cerr << "JSON parse error: " << e.what() << '\n';
-    return 2;
+    return 4;
   }
 
   return 0;
 }
 
-void updateWorker() {
+void updateWorker(const bool daemon) {
   while (true) {
-    if (!isInternetAvailable()) {
-      waitInternet(900);
-      continue;
+    if (daemon) {
+      const int sleepDuration = secondsUntilMidnight();
+      std::this_thread::sleep_for(std::chrono::seconds(sleepDuration + 1));
     }
 
     std::vector<std::string> newTimings;
     std::string newHijri;
 
-    const int result = getTimings(newTimings, newHijri);
-    if (result == 0) {
-      {
-        std::lock_guard lock(dataMutex);
-        prayerTimings = std::move(newTimings);
-        const string hijriDate = std::move(newHijri);
-        waybarTooltip = formatTooltip(prayerTimings, hijriDate, names, hour24);
-      }
-      timingsReady.notify_one();
+    bool updated = true;
+
+    if (const int result = getTimings(newTimings, newHijri); result == 0) {
+      std::lock_guard lock(dataMutex);
+      prayerTimings = std::move(newTimings);
+      const string hijriDate = std::move(newHijri);
+      waybarTooltip = formatTooltip(prayerTimings, hijriDate, names, hour24);
     } else {
-      std::cerr << "Failed to update timings (error code " << result
-                << "). Retrying in 10 minutes.\n";
+      cerr << "Failed to update timings (error code " << result << ")\n";
+      if (const int chk = loadCachedTimings()) {
+        if (chk == 2) {
+          cerr << "No cached timings\n";
+        } else {
+          cerr << "Failed to load cached timings! " << chk << endl;
+        }
+      } else {
+        // Format the tooltip with the cached timings without hijriDate
+        waybarTooltip = formatTooltip(prayerTimings, "NULL", names, hour24);
+        if (!daemon) return;
+      }
+      // Error getting timings (mostly no Internet connection)
+      updated = false;
+      cerr << "Retrying in 10 minutes..." << endl;
       std::this_thread::sleep_for(std::chrono::minutes(10));
-      continue;
     }
-    const int sleepDuration = secondsUntilMidnight();
-    std::this_thread::sleep_for(std::chrono::seconds(sleepDuration + 1));
+    if (!daemon && updated) return;
   }
 }

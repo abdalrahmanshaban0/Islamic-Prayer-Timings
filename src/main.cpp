@@ -1,4 +1,3 @@
-#include <condition_variable>
 #include <iostream>
 #include <ostream>
 #include <thread>
@@ -15,33 +14,60 @@ string waybarTooltip;
 string onAdhanScript;
 
 mutex dataMutex;
-condition_variable timingsReady;
+
+const char* argv0;
+
+inline void printUsage() { cout << "Usage: " << argv0 << " [-d|--daemon]\n"; }
 
 auto ErrorInRed = "\033[31m[ERROR] \033[0m";
 
-int main() {
+int main(const int argc, char* argv[]) {
+  argv0 = argv[0];
+  bool daemon = false;
+
+  if (argc > 2) {
+    printUsage();
+    return 1;
+  }
+  if (argc == 2) {
+    if (const string arg(argv[1]); arg == "-d" || arg == "--daemon") {
+      daemon = true;
+    } else {
+      printUsage();
+      return 0;
+    }
+  }
+
   if (const int chk = loadConfig()) {
     cerr << ErrorInRed << "Loading config" << endl;
     return chk;
   }
 
-  if (!isInternetAvailable()) {
-    if (const int chk = loadCachedTimings()) {
-      if (chk != 2) {
-        cerr << ErrorInRed << "Failed to load cached timings!" << endl;
-        return chk;
-      }
-      waitInternet(30);
-    }
+  updateWorker(false);
+
+  if (!daemon) {
+    auto [nextPrayIdx, diff] = getNextPrayer(prayerTimings);
+    const string nextPrayer = names[nextPrayIdx] + " " + seconds_to_HMS(diff);
+    cout << "⠀⠀⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠀⠀\n"
+            "⠀⣰⣿⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⣆⠀\n"
+            "⠠⠿⠿⠿⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠿⠿⠿⠄\n"
+            "⢰⣶⣶⣶⡄⠀⠀⠀⠀⣀⣴⣾⣿⣿⣷⣦⣀⠀⠀⠀⠀⢠⣶⣶⣶⡆\n"
+            "⢸⣿⣿⣿⡇⠀⠀⢠⣾⣿⣿⣿⣿⣿⣿⣿⣿⣷⡄⠀⠀⢸⣿⣿⣿⡇\n"
+            "⢸⣿⣿⣿⡇⠀⢠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡄⠀⢸⣿⣿⣿⡇\n"
+            "⢸⣿⣿⣿⡇⠀⠈⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠁⠀⢸⣿⣿⣿⡇\n"
+            "⢸⣿⣿⣿⡇⢰⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⡆⢸⣿⣿⣿⡇\n"
+            "⢸⣿⣿⣿⡇⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⢸⣿⣿⣿⡇\n"
+            "⢸⣿⣿⣿⡇⢸⣿⣿⣿⣿⣿⠟⠁⠈⠻⣿⣿⣿⣿⣿⡇⢸⣿⣿⣿⡇\n"
+            "⢸⣿⣿⣿⡇⢸⣿⣿⣿⣿⡏⠀⠀⠀⠀⢹⣿⣿⣿⣿⡇⢸⣿⣿⣿⡇\n"
+            "⢸⣿⣿⣿⡇⢸⣿⣿⣿⣿⡇⠀⠀⠀⠀⢸⣿⣿⣿⣿⡇⢸⣿⣿⣿⡇\n"
+            "⠸⠿⠿⠿⠇⠸⠿⠿⠿⠿⠇⠀⠀⠀⠀⠸⠿⠿⠿⠿⠇⠸⠿⠿⠿⠇\n";
+
+    cout << nextPrayer << '\n';
+    cout << waybarTooltip << endl;
+    return 0;
   }
 
-  std::thread t(updateWorker);
-
-  {
-    std::unique_lock lock(dataMutex);
-    timingsReady.wait(lock, [] { return !prayerTimings.empty(); });
-  }
-
+  std::thread t(updateWorker, true);
   t.detach();
 
   while (true) {
