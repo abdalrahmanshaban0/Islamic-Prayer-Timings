@@ -1,22 +1,14 @@
 #include "../include/utils.h"
 
-#include <arpa/inet.h>
 #include <libnotify/notify.h>
-#include <sys/socket.h>
-#include <unistd.h>
 
-#include <ctime>
 #include <filesystem>
-#include <iomanip>
 #include <iostream>
-#include <nlohmann/json.hpp>
-#include <ostream>
-#include <thread>
 
 using namespace std;
 namespace fs = std::filesystem;
 
-string seconds_to_HMS(int total_seconds) {
+string seconds_to_HMS(const int total_seconds) {
   const int hours = total_seconds / 3600;
   const int minutes = (total_seconds % 3600) / 60;
   const int seconds = total_seconds % 60;
@@ -45,28 +37,6 @@ pair<int, int> getNextPrayer(const vector<string>& prayerTimings) {
   int diff = comming_val - cur_val;
   if (diff < 0) diff += 24 * 3600;
   return {comming_idx, diff};
-}
-
-bool isInternetAvailable() {
-  int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-  if (sockfd < 0) return false;
-
-  sockaddr_in addr{};
-  addr.sin_family = AF_INET;
-  addr.sin_port = htons(53);
-  inet_pton(AF_INET, "8.8.8.8", &addr.sin_addr);
-
-  bool connected = connect(sockfd, reinterpret_cast<struct sockaddr*>(&addr),
-                           sizeof(addr)) == 0;
-  close(sockfd);
-  return connected;
-}
-
-void waitInternet(const int duration) {
-  while (!isInternetAvailable()) {
-    cerr << "Waiting for internet connection..." << endl;
-    std::this_thread::sleep_for(std::chrono::seconds(duration));
-  }
 }
 
 int send_prayer_notification(const string& prayer_name) {

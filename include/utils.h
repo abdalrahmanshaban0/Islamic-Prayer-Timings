@@ -52,10 +52,4 @@ void runScript(const std::string& scriptPath);
  * @return Seconds until midnight
  */
 int secondsUntilMidnight();
-
-/**
- * Enters infinite loop until there's internet connection
- * @param duration Seconds to sleep until checking internet connection again
- */
-void waitInternet(int duration);
 #endif
