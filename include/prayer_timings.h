@@ -52,8 +52,10 @@ int getTimings(std::vector<std::string>& timings, std::string& hdate);
  * waybarTooltip).
  *  - Sleeps until a second past midnight, then repeats.
  *
+ * @param[in] daemon A boolean that determines if timings get updated once or
+ * periodically
  * This function never returns.
  */
-[[noreturn]] void updateWorker();
+void updateWorker(bool daemon);
 
 #endif
