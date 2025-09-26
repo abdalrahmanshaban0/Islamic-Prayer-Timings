@@ -1,0 +1,30 @@
+name: Clang-Format Check
+
+on:
+  pull_request:
+    paths:
+      - '**/*.cpp'
+      - '**/*.hpp'
+      - '**/*.h'
+      - '**/*.cc'
+      - '**/*.c'
+
+jobs:
+  clang-format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install clang-format
+        run: sudo apt-get install -y clang-format-14
+
+      - name: Run clang-format check
+        run: |
+          files=$(git diff --name-only origin/${{ github.base_ref }} | grep -E '\.((cpp)|(hpp)|(cc)|(c)|(h))$' || true)
+          if [ -n "$files" ]; then
+            echo "Checking formatting..."
+            clang-format-14 --dry-run --Werror $files
+          else
+            echo "No C++ files to check."
+          fi
