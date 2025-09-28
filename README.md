@@ -13,6 +13,11 @@ See my post about this project in my technical blog [here](https://sudostart.com
 <img width="558" height="551" alt="image" src="https://github.com/user-attachments/assets/0280804e-cb0b-4ee8-ae2f-65642dee40ae" />
 </p>
 
+## Install on Arch-based distributions
+The project is available on the [AUR](https://aur.archlinux.org/packages/islamic-prayer-timings). To install it using AUR helper like `yay` or `paru`:
+```
+paru -S islamic-prayer-timings
+```
 
 
 ## Build and run
