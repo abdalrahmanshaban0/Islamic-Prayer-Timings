@@ -10,7 +10,7 @@ See my post about this project in my technical blog [here](https://sudostart.com
 </p>
 
 <p align="center">
-<img width="548" height="542" alt="image" src="https://github.com/user-attachments/assets/f9412260-4515-4291-b6e3-948bf2b1c6d1" />
+<img width="558" height="551" alt="image" src="https://github.com/user-attachments/assets/0280804e-cb0b-4ee8-ae2f-65642dee40ae" />
 </p>
 
 
