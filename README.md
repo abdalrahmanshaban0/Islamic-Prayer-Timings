@@ -26,10 +26,10 @@ cmake ..
 make
 
 # non-daemon
-./IPT
+./islamic-prayer-timings
 
 # daemon
-./IPT -d
+./islamic-prayer-timings -d
   #OR
-./IPT --daemon
+./islamic-prayer-timings --daemon
 ```
