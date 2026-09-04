@@ -1,7 +1,7 @@
 #include <iostream>
 #include <ostream>
 #include <thread>
-
+#include <mutex>
 #include "../include/prayer_timings.h"
 #include "../include/utils.h"
 #include "../include/waybar.h"
