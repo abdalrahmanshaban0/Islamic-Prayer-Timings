@@ -15,6 +15,16 @@ inline std::string names[] = {"Fajr", "Sunrise", "Dhuhr",
 int loadConfig();
 
 /**
+ * Sets the coordinates used to fetch prayer timings. When set, they take
+ * priority over the country and city from the config. Call it after
+ * loadConfig() so that coordinates given on the command line override the ones
+ * in the config.
+ * @param lat Latitude in degrees, in the range [-90, 90]
+ * @param lon Longitude in degrees, in the range [-180, 180]
+ */
+void setCoordinates(double lat, double lon);
+
+/**
  * Gets prayer timings from the cached json response if it's found in
  * ~/.local/share/IslamicPrayerTimings/timings.json and assigns it to the
  * prayerTimings shared variable. This is useful when opening the system without
@@ -27,7 +37,9 @@ int loadCachedTimings();
  * @brief Fetches Islamic prayer timings and the current Hijri date.
  *
  * Sends an HTTP GET request to the Aladhan API to retrieve today's prayer
- * times and Hijri date. The response is cached in
+ * times and Hijri date. If coordinates were set (via the config or
+ * setCoordinates()) they are used, otherwise the country and city are used.
+ * The response is cached in
  * `~/.local/IslamicPrayerTimings/timings.json` so that it can be reused if
  * there is no internet connection on subsequent calls.
  *
