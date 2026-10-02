@@ -2,10 +2,15 @@
 
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
-#include <nlohmann/json.hpp>
-#include <thread>
+#include <locale>
 #include <mutex>
+#include <nlohmann/json.hpp>
+#include <optional>
+#include <sstream>
+#include <thread>
+
 #include "../include/prayer_timings.h"
 #include "../include/utils.h"
 #include "../include/waybar.h"
@@ -15,6 +20,7 @@ namespace fs = filesystem;
 
 // config variables
 static string country, city;
+static optional<double> latitude, longitude;
 static bool hour24;
 extern string onAdhanScript;
 
@@ -22,6 +28,11 @@ extern vector<string> prayerTimings;
 extern string waybarTooltip;
 
 extern mutex dataMutex;
+
+void setCoordinates(const double lat, const double lon) {
+  latitude = lat;
+  longitude = lon;
+}
 
 int loadConfig() {
   const char* homeEnv = std::getenv("HOME");
@@ -42,6 +53,8 @@ int loadConfig() {
       nlohmann::json defaultConfig = {
           {"country", "Egypt"},
           {"city", "Cairo"},
+          {"latitude", 30.0444},
+          {"longitude", 31.2357},
           {"hour24", false},
           {"onAdhan", "~/.config/IslamicPrayerTimings/inAdhan.sh"}};
 
@@ -75,6 +88,28 @@ int loadConfig() {
       country = configJson["country"].get<std::string>();
     if (configJson.contains("city"))
       city = configJson["city"].get<std::string>();
+
+    const bool hasLat = configJson.contains("latitude");
+    const bool hasLon = configJson.contains("longitude");
+
+    if (hasLat != hasLon) {
+      std::cerr << "Config: \"latitude\" and \"longitude\" must be specified "
+                   "together (found only \""
+                << (hasLat ? "latitude" : "longitude") << "\")\n";
+      return 5;
+    }
+
+    if (hasLat && hasLon) {
+      const double lat = configJson["latitude"].get<double>();
+      const double lon = configJson["longitude"].get<double>();
+      if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+        std::cerr << "Config: latitude must be in [-90, 90] and longitude in "
+                     "[-180, 180]\n";
+        return 5;
+      }
+      setCoordinates(lat, lon);
+    }
+
     if (configJson.contains("hour24"))
       hour24 = configJson["hour24"].get<bool>();
     if (configJson.contains("onAdhan"))
@@ -140,6 +175,14 @@ static size_t WriteCallback(void* contents, const size_t size,
   return totalSize;
 }
 
+static string urlEscape(CURL* curl, const string& s) {
+  char* escaped = curl_easy_escape(curl, s.c_str(), static_cast<int>(s.size()));
+  if (!escaped) return s;
+  string result(escaped);
+  curl_free(escaped);
+  return result;
+}
+
 int getTimings(std::vector<std::string>& timings, std::string& hdate) {
   std::string readBuffer;
 
@@ -150,9 +193,18 @@ int getTimings(std::vector<std::string>& timings, std::string& hdate) {
     return 1;
   }
 
-  const std::string url =
-      "https://api.aladhan.com/v1/timingsByCity?city=" + city +
-      "&country=" + country;
+  string url;
+  if (latitude && longitude) {
+    // Use the classic locale so the decimal separator is always '.'
+    ostringstream coords;
+    coords.imbue(locale::classic());
+    coords << setprecision(10) << "latitude=" << *latitude
+           << "&longitude=" << *longitude;
+    url = "https://api.aladhan.com/v1/timings?" + coords.str();
+  } else {
+    url = "https://api.aladhan.com/v1/timingsByCity?city=" +
+          urlEscape(curl, city) + "&country=" + urlEscape(curl, country);
+  }
 
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);

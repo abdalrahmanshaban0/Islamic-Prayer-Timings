@@ -1,7 +1,10 @@
+#include <cstring>
 #include <iostream>
-#include <ostream>
-#include <thread>
 #include <mutex>
+#include <optional>
+#include <ostream>
+#include <stdexcept>
+#include <thread>
 #include "../include/prayer_timings.h"
 #include "../include/utils.h"
 #include "../include/waybar.h"
@@ -17,31 +20,61 @@ mutex dataMutex;
 
 const char* argv0;
 
-inline void printUsage() { cout << "Usage: " << argv0 << " [-d|--daemon]\n"; }
+inline void printUsage() {
+  cout << "Usage: " << argv0
+       << " [-d|--daemon] [--lat <latitude> --long <longitude>]\n";
+}
 
 auto ErrorInRed = "\033[31m[ERROR] \033[0m";
 
 int main(const int argc, char* argv[]) {
   argv0 = argv[0];
   bool daemon = false;
+  optional<double> lat, lon;
 
-  if (argc > 2) {
-    printUsage();
-    return 1;
-  }
-  if (argc == 2) {
-    if (const string arg(argv[1]); arg == "-d" || arg == "--daemon") {
+  for (int i = 1; i < argc; ++i) {
+    const string arg = argv[i];
+    if (arg == "-d" || arg == "--daemon") {
       daemon = true;
+    } else if (arg == "--lat" || arg == "--long") {
+      if (i + 1 >= argc) {
+        printUsage();
+        return 1;
+      }
+      const char* value = argv[++i];
+      try {
+        size_t pos = 0;
+        const double v = stod(value, &pos);
+        if (pos != strlen(value)) throw invalid_argument("trailing chars");
+        (arg == "--lat" ? lat : lon) = v;
+      } catch (const exception&) {
+        cerr << ErrorInRed << "Invalid value for " << arg << ": " << value
+             << endl;
+        return 1;
+      }
     } else {
       printUsage();
-      return 0;
+      return 1;
     }
+  }
+
+  if (lat.has_value() != lon.has_value()) {
+    cerr << ErrorInRed << "--lat and --long must be used together" << endl;
+    return 1;
+  }
+  if (lat && (*lat < -90 || *lat > 90 || *lon < -180 || *lon > 180)) {
+    cerr << ErrorInRed << "Latitude must be in [-90, 90] and longitude in "
+                          "[-180, 180]" << endl;
+    return 1;
   }
 
   if (const int chk = loadConfig()) {
     cerr << ErrorInRed << "Loading config" << endl;
     return chk;
   }
+
+  // CLI coordinates override the config (and city/country)
+  if (lat) setCoordinates(*lat, *lon);
 
   updateWorker(false);
 
